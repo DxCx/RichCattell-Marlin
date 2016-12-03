@@ -182,7 +182,7 @@ float add_homeing[3]={0,0,0};
   float delta_radius; // = DEFAULT_delta_radius;
   float delta_diagonal_rod; // = DEFAULT_DELTA_DIAGONAL_ROD;
   float DELTA_DIAGONAL_ROD_2;
-  float ac_prec = AUTOCALIBRATION_PRECISION / 2;
+  float delta_default_prec = AUTOCALIBRATION_PRECISION;
   float bed_radius = BED_DIAMETER / 2;
   float delta_tower1_x, delta_tower1_y;
   float delta_tower2_x, delta_tower2_y;
@@ -1506,7 +1506,8 @@ void process_commands()
       break;
     case 30: //G30 Delta AutoCalibration
       int iterations;
-      
+      float ac_prec;
+
       //Zero the bed level array
       for (int y = 0; y < 7; y++)
         {
@@ -1566,8 +1567,12 @@ void process_commands()
       
        if (code_seen('A')) 
          {
-         SERIAL_ECHOLN("Starting Auto Calibration..");
-       
+
+         ac_prec = code_value() ? code_value() : delta_default_prec;
+         SERIAL_ECHO("Starting Auto Calibration.. Aiming for Precision of ");
+         SERIAL_ECHOLN(ac_prec);
+         ac_prec = ac_prec / 2;
+
         //Zero the bedlevel array in case this affects bed probing
         for (int y = 0; y >=6; y++)
           {
