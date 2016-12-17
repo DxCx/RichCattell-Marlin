@@ -251,6 +251,7 @@ const char axis_codes[NUM_AXIS] = {'X', 'Y', 'Z', 'E'};
 const float SIN_60 = 0.8660254037844386;
 const float COS_60 = 0.5;
 static float destination[NUM_AXIS] = {  0.0, 0.0, 0.0, 0.0};
+static bool is_probing = false;
 static float offset[3] = {0.0, 0.0, 0.0};
 static float bed_level[7][7] = {
   {0, 0, 0, 0, 0, 0, 0},
@@ -1044,11 +1045,13 @@ float probe_bed(float x, float y)
   float probe_bed_z, probe_z, probe_h, probe_l;
   int probe_count;
 //  feedrate = homing_feedrate[Z_AXIS];
+  is_probing = true;
   destination[X_AXIS] = x - z_probe_offset[X_AXIS];
   destination[Y_AXIS] = y - z_probe_offset[Y_AXIS];
   destination[Z_AXIS] = bed_level_c - z_probe_offset[Z_AXIS] + 3;
   prepare_move();
   st_synchronize();
+  is_probing = false;
 
   probe_count = 0;
   probe_z = -100;
@@ -1079,15 +1082,16 @@ float probe_bed(float x, float y)
     SERIAL_ECHOLN("");
     }
     */
-  /*
+
+#ifdef DEBUG_MESSAGES
   SERIAL_ECHO("Bed Z-Height at X:");
   SERIAL_ECHO(x);
   SERIAL_ECHO(" Y:");
   SERIAL_ECHO(y);
   SERIAL_ECHO(" = ");
   SERIAL_PROTOCOL_F(probe_bed_z, 4);
-  SERIAL_ECHOLN("");      
-  */
+  SERIAL_ECHOLN("");
+#endif
 
   return probe_bed_z;
   }
@@ -3414,21 +3418,46 @@ void get_arc_coordinates()
 
 void clamp_to_software_endstops(float target[3])
 {
+  float clamp_min_pos[] = { min_pos[X_AXIS], min_pos[Y_AXIS], min_pos[Z_AXIS] };
+  float clamp_max_pos[] = { max_pos[X_AXIS], max_pos[Y_AXIS], max_pos[Z_AXIS] };
+
+  if ( is_probing ) {
+    if ( z_probe_offset[X_AXIS] > 0 ) {
+      clamp_min_pos[X_AXIS] -= z_probe_offset[X_AXIS];
+    } else {
+      clamp_max_pos[X_AXIS] += z_probe_offset[X_AXIS];
+    }
+
+    if ( z_probe_offset[Y_AXIS] > 0 ) {
+      clamp_min_pos[Y_AXIS] -= z_probe_offset[Y_AXIS];
+    } else {
+      clamp_max_pos[Y_AXIS] += z_probe_offset[Y_AXIS];
+    }
+
+#if 0 // TODO: For debug purpose, need to cleanup
+    SERIAL_ECHO("Clamping.. X:");
+    SERIAL_ECHO(target[X_AXIS]);
+    SERIAL_ECHO(" Y:");
+    SERIAL_ECHO(target[Y_AXIS]);
+    SERIAL_ECHOLN("");
+#endif
+  }
+
   if (min_software_endstops) {
-    if (target[X_AXIS] < min_pos[X_AXIS]) target[X_AXIS] = min_pos[X_AXIS];
-    if (target[Y_AXIS] < min_pos[Y_AXIS]) target[Y_AXIS] = min_pos[Y_AXIS];
-    if (target[Z_AXIS] < min_pos[Z_AXIS]) target[Z_AXIS] = min_pos[Z_AXIS];
+    if (target[X_AXIS] < clamp_min_pos[X_AXIS]) target[X_AXIS] = clamp_min_pos[X_AXIS];
+    if (target[Y_AXIS] < clamp_min_pos[Y_AXIS]) target[Y_AXIS] = clamp_min_pos[Y_AXIS];
+    if (target[Z_AXIS] < clamp_min_pos[Z_AXIS]) target[Z_AXIS] = clamp_min_pos[Z_AXIS];
   }
 
   if (max_software_endstops) {
-    if (target[X_AXIS] > max_pos[X_AXIS]) target[X_AXIS] = max_pos[X_AXIS];
-    if (target[Y_AXIS] > max_pos[Y_AXIS]) target[Y_AXIS] = max_pos[Y_AXIS];
-    if (target[Z_AXIS] > max_pos[Z_AXIS]) target[Z_AXIS] = max_pos[Z_AXIS];
+    if (target[X_AXIS] > clamp_max_pos[X_AXIS]) target[X_AXIS] = clamp_max_pos[X_AXIS];
+    if (target[Y_AXIS] > clamp_max_pos[Y_AXIS]) target[Y_AXIS] = clamp_max_pos[Y_AXIS];
+    if (target[Z_AXIS] > clamp_max_pos[Z_AXIS]) target[Z_AXIS] = clamp_max_pos[Z_AXIS];
   }
 }
 
 #ifdef DELTA
-void calculate_delta(float cartesian[3]) 
+void calculate_delta(float cartesian[3])
 {
   delta[X_AXIS] = sqrt(DELTA_DIAGONAL_ROD_2
                        - sq(delta_tower1_x-cartesian[X_AXIS])
