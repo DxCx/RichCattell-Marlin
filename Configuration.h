@@ -123,14 +123,14 @@
 // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
 #define ZPROBE_Y_OFFSET 33
 #define ZPROBE_X_OFFSET -5
-#define ZPROBE_Z_OFFSET -0.10
+#define ZPROBE_Z_OFFSET -0.13
 #define DELTA_PRINTABLE_RADIUS 40.0
 
 //Uncomment to enable autocalibration debug messages
 #define DEBUG_MESSAGES
 
 // Precision for G30 delta autocalibration function
-#define AUTOCALIBRATION_PRECISION 0.03 // mm
+#define AUTOCALIBRATION_PRECISION 0.15 // mm
 
 // Diameter of print bed - this is used to set the distance that autocalibration probes the bed at.
 #define BED_DIAMETER 80 // mm
@@ -394,7 +394,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define XYZ_PULLEY_TEETH 16
 #define XYZ_STEPS (XYZ_FULL_STEPS_PER_ROTATION * XYZ_MICROSTEPS / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {XYZ_STEPS, XYZ_STEPS, XYZ_STEPS, 90.80}  // default steps per unit for Kossel (GT2, 20 tooth)
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {XYZ_STEPS, XYZ_STEPS, XYZ_STEPS, 91.25}  // default steps per unit for Kossel (GT2, 20 tooth)
 #define DEFAULT_MAX_FEEDRATE          {200, 200, 200, 200}
 #define DEFAULT_MAX_ACCELERATION      {3000,3000,3000,3000}
 
