@@ -8,7 +8,7 @@
  */
 // How to Calibrate using this firmware:
 /*
- * Using G30 A<PRECISION>
+ * Using G30 A<PRECISION> [D<Set Fixed Diag Rod Length>] [R<Set Fixed Delta Radius]
  * Need to do it in steps, hence:
  * 1. G30 A1.00
  * 2. G30 A0.80
@@ -106,23 +106,23 @@
 #define DELTA_SEGMENTS_PER_SECOND 200
 
 // Center-to-center distance of the holes in the diagonal push rods.
-#define DEFAULT_DELTA_DIAGONAL_ROD 218.0 // mm
+#define DEFAULT_DELTA_DIAGONAL_ROD 220.0 // mm
 
 // Horizontal offset from middle of printer to smooth rod center.
 #define DELTA_SMOOTH_ROD_OFFSET 150 // mm //158
 
 // Horizontal offset of the universal joints on the end effector.
-#define DELTA_EFFECTOR_OFFSET 25 // mm
+#define DELTA_EFFECTOR_OFFSET 20 // mm
 
 // Horizontal offset of the universal joints on the carriages.
-#define DELTA_CARRIAGE_OFFSET 25 // mm
+#define DELTA_CARRIAGE_OFFSET 21 // mm
 
 // Effective horizontal distance bridged by diagonal push rods.
 #define DEFAULT_DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-DELTA_EFFECTOR_OFFSET-DELTA_CARRIAGE_OFFSET)
 
 // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
-#define ZPROBE_Y_OFFSET 33
-#define ZPROBE_X_OFFSET -5
+#define ZPROBE_Y_OFFSET 41
+#define ZPROBE_X_OFFSET 0
 #define ZPROBE_Z_OFFSET -0.13
 #define DELTA_PRINTABLE_RADIUS 40.0
 
